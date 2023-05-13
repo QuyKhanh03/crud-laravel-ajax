@@ -14,8 +14,9 @@ class UserController extends Controller
             $data = User::select('*')->get();
             return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function($row){
-                $btn = '<a href="javascript:void(0)" data-id="'.$row->id.'"  class=" btn btn-danger removeItem">Remove</a>
-                <a href="javascript:void(0)" data-id="'.$row->id.'" class="edit btn btn-success">Edit</a>';
+                $btn = '<a href="javascript:void(0)" data-id="'.$row->id.'"  class=" btn btn-danger removeItem">Remove</a>';
+                $btn .= '  <a href="javascript:void(0)" data-id="'.$row->id.'" class="edit btn btn-success editItem">Edit</a>';
+                $btn .= '  <a href="javascript:void(0)" data-id="'.$row->id.'" class="view btn btn-info viewItem">View</a>';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -45,6 +46,15 @@ class UserController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required',
+        ]);
+        $item = User::updateOrCreate(['id' => $request->id],
+        ['name' => $request->name, 'email' => $request->email]);
+        return response()->json(['success'=>'User saved successfully.']);
+
+
     }
 
     /**
@@ -53,6 +63,8 @@ class UserController extends Controller
     public function show(string $id)
     {
         //
+        $item = User::find($id);
+        return response()->json($item);
     }
 
     /**
@@ -61,6 +73,8 @@ class UserController extends Controller
     public function edit(string $id)
     {
         //
+        $item = User::find($id);
+        return response()->json($item);
     }
 
     /**

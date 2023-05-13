@@ -10,16 +10,6 @@ $(document).ready(function () {
             {data : 'action', name : 'action', orderable : false, searchable : false}
         ]
     })
-
-
-    $('.btnAdd').click(function () {
-        $('#myModal').modal('show')
-
-    })
-    $('.close').click(function () {
-        $('#myModal').modal('hide')
-    })
-
     $('body').on('click', '.removeItem', function (e) {
         var id = $(this).attr('data-id')
         $.ajax({
@@ -33,4 +23,76 @@ $(document).ready(function () {
             }
         })
     })
+
+    $('body').on('click', '.viewItem', function (e) {
+        var id = $(this).attr('data-id')
+        $('#modalView').modal('show')
+        $.ajax({
+            url : 'view-user/' + id,
+            type : 'GET',
+            dataType : 'json',
+            success : function (response) {
+                $('#name').text(response.name)
+                $('#email').text(response.email)
+            }
+        })
+    })
+    $('.close').click(function () {
+        $('#modalView').modal('hide')
+    })
+
+    $('.btnAdd').click(function () {
+        $('#myModal').modal('show')
+        $('.modal-title').text('Add New User')
+        $('#formModal')[0].reset()
+    })
+    $('.close').click(function () {
+        $('#myModal').modal('hide')
+    })
+
+
+    $('body').on('click', '.editItem', function (e) {
+        $('#formModal')[0].reset()
+        $('#myModal').modal('show')
+        $('.modal-title').text('Edit User')
+
+        var id = $(this).attr('data-id')
+        $.ajax({
+            url : 'edit-user/' + id,
+            type : 'GET',
+            dataType : 'json',
+            success : function (response) {
+                $('#id').val(response.id)
+                $('#name').val(response.name)
+                $('#email').val(response.email)
+            }
+        })
+    })
+    $('body').on('click', '.btnSave', function (e) {
+        e.preventDefault()
+        var id = $('#id').val()
+        let user_url;
+        if(id) {
+            // url = "http://127.0.0.1:8000/update-user/" + id + "
+        }else {
+            user_url = '{{ url("add-user") }}'
+        }
+        console.log(user_url);
+        $.ajax({
+            url : user_url,
+            type : 'POST',
+            data : $('#formModal').serialize(),
+            dataType : 'json',
+            success : function (response) {
+                console.log(response);
+                console.log(url);
+                // if(response.success) {
+                //     toastr["success"](response.success)
+                //     $('#myModal').modal('hide')
+                //     $('#myTable').DataTable().ajax.reload()
+                // }
+            }
+        })
+    })
+
 })
