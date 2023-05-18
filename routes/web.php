@@ -21,6 +21,6 @@ Route::get('list-users', [UserController::class, 'getUsers'])->name('list-users'
 Route::get('users', [UserController::class, 'index'])->name('products');
 Route::get('delete-user/{id}', [UserController::class, 'destroy'])->name('delete-user');
 Route::get('edit-user/{id}', [UserController::class, 'edit'])->name('edit-user');
-Route::post('update-user/{id}', [UserController::class, 'update'])->name('update-user');
+Route::post('update-user/{id}', [UserController::class, 'store'])->name('update-user');
 Route::get('view-user/{id}', [UserController::class, 'show'])->name('view-user');
-Route::post('add-user','UserController@store')->name('add-user');
+Route::post('add-user', [UserController::class, 'store'])->name('add-user');

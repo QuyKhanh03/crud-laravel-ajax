@@ -43,19 +43,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required',
-        ]);
-        $item = User::updateOrCreate(['id' => $request->id],
-        ['name' => $request->name, 'email' => $request->email]);
-        return response()->json(['success'=>'User saved successfully.']);
 
-
-    }
 
     /**
      * Display the specified resource.
@@ -76,7 +64,22 @@ class UserController extends Controller
         $item = User::find($id);
         return response()->json($item);
     }
-
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'email'
+        ]);
+        User::updateOrCreate(
+            ['id' => $request->id],
+            [
+                'name' => $request->name,
+                'password' => "123456",
+                'email' => $request->email
+            ]
+        );
+        return response()->json(['success'=>'User saved successfully.']);
+    }
     /**
      * Update the specified resource in storage.
      */

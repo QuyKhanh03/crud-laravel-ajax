@@ -1,5 +1,10 @@
 $(document).ready(function () {
-    $('#myTable').DataTable({
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    var table = $('#myTable').DataTable({
         processing : true,
         serverSide : true,
         ajax : 'list-users',
@@ -19,13 +24,13 @@ $(document).ready(function () {
             success : function (response) {
                 toastr["success"](response.success)
                 $('#myTable').DataTable().ajax.reload()
-
             }
         })
     })
 
     $('body').on('click', '.viewItem', function (e) {
         var id = $(this).attr('data-id')
+        $('.modal-title').text('Detail User')
         $('#modalView').modal('show')
         $.ajax({
             url : 'view-user/' + id,
@@ -42,57 +47,64 @@ $(document).ready(function () {
     })
 
     $('.btnAdd').click(function () {
+        $('#id').val('')
         $('#myModal').modal('show')
-        $('.modal-title').text('Add New User')
-        $('#formModal')[0].reset()
+        $('#formModal')[0].reset();
+        $('.modal-title').html('Add New User')
     })
     $('.close').click(function () {
         $('#myModal').modal('hide')
+        $('#formModal')[0].reset()
     })
+    if($('#myModal').modal('hide')) {
+        $('#formModal')[0].reset()
+    }
 
 
     $('body').on('click', '.editItem', function (e) {
         $('#formModal')[0].reset()
         $('#myModal').modal('show')
         $('.modal-title').text('Edit User')
-
         var id = $(this).attr('data-id')
         $.ajax({
             url : 'edit-user/' + id,
             type : 'GET',
             dataType : 'json',
             success : function (response) {
-                $('#id').val(response.id)
-                $('#name').val(response.name)
-                $('#email').val(response.email)
+                $('.name').val(response.name)
+                $('.email').val(response.email)
+                $('.id').val(response.id)
             }
         })
     })
+
     $('body').on('click', '.btnSave', function (e) {
         e.preventDefault()
-        var id = $('#id').val()
+        let id = $('#id').val()
         let user_url;
         if(id) {
-            // url = "http://127.0.0.1:8000/update-user/" + id + "
+            user_url = '/update-user/' + id ;
         }else {
-            user_url = '{{ url("add-user") }}'
+            user_url = "/add-user";
         }
-        console.log(user_url);
         $.ajax({
             url : user_url,
             type : 'POST',
             data : $('#formModal').serialize(),
             dataType : 'json',
             success : function (response) {
-                console.log(response);
-                console.log(url);
-                // if(response.success) {
-                //     toastr["success"](response.success)
-                //     $('#myModal').modal('hide')
-                //     $('#myTable').DataTable().ajax.reload()
-                // }
+                toastr["success"](response.success)
+                    $('#formModal').trigger("reset");
+                    $('#myModal').modal('hide')
+                    table.draw()
+            },
+            error : function (response) {
+                $.each(response.responseJSON.errors, function (key, value) {
+                    toastr["error"](value)
+                    $('[name = "'+key+'"]').after('<span class="text-danger">'+value+'</span>')
+                })
             }
         })
     })
-
 })
+
