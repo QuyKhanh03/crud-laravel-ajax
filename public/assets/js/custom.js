@@ -1,9 +1,5 @@
 $(document).ready(function () {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+
     var table = $('#myTable').DataTable({
         processing : true,
         serverSide : true,
@@ -93,6 +89,7 @@ $(document).ready(function () {
             data : $('#formModal').serialize(),
             dataType : 'json',
             success : function (response) {
+                $('.text-danger').remove()
                 toastr["success"](response.success)
                     $('#formModal').trigger("reset");
                     $('#myModal').modal('hide')
